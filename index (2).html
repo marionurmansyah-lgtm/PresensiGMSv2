@@ -1,0 +1,211 @@
+﻿<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Graha Mega Solusindo - Presensi</title>
+
+<style>
+:root{
+  --navy:#0b2a55;
+  --blue:#1f5fbf;
+  --soft:#f4f7fb;
+  --danger:#e74c3c;
+}
+*{box-sizing:border-box;font-family:Segoe UI,Arial}
+body{margin:0;background:var(--soft)}
+header{
+  background:linear-gradient(135deg,var(--navy),var(--blue));
+  color:#fff;padding:30px 15px;text-align:center
+}
+h1{margin:0;font-size:26px}
+.sub{opacity:.9}
+
+.card{
+  background:#fff;border-radius:14px;
+  padding:20px;margin:20px auto;
+  width:90%;max-width:420px;
+  box-shadow:0 10px 30px rgba(0,0,0,.08)
+}
+input,button,select,textarea{
+  width:100%;padding:12px;margin-top:10px;
+  border-radius:10px;border:1px solid #ccc;
+  font-size:15px
+}
+button{
+  background:var(--blue);color:#fff;
+  border:none;font-weight:600
+}
+button.secondary{background:#6c8cd5}
+button.danger{background:var(--danger)}
+.hidden{display:none}
+
+.user-card{
+  background:linear-gradient(135deg,#0b2a55,#163f8c);
+  color:#fff;border-radius:14px;
+  padding:20px;margin:20px
+}
+.user-card .icon{
+  font-size:48px;opacity:.8
+}
+.marquee{
+  background:#e96a6a;color:#fff;
+  padding:8px;border-radius:8px;
+  margin:10px 20px;font-size:14px
+}
+
+.grid{
+  display:grid;grid-template-columns:1fr 1fr;
+  gap:10px;margin:20px
+}
+
+footer{
+  text-align:center;color:#999;
+  font-size:12px;margin:30px
+}
+</style>
+</head>
+
+<body>
+
+<header>
+  <h1>Graha Mega Solusindo</h1>
+  <div class="sub">Sistem Presensi Digital</div>
+</header>
+
+<!-- LOGIN -->
+<div class="card" id="loginBox">
+  <h2>Selamat Datang</h2>
+  <input id="loginId" placeholder="ID Karyawan / Admin">
+  <input id="loginName" placeholder="Nama Lengkap">
+  <button onclick="login()">Masuk</button>
+</div>
+
+<!-- USER DASHBOARD -->
+<div id="userDash" class="hidden">
+  <div class="user-card">
+    <div class="icon">👤</div>
+    <div id="uName"></div>
+    <div id="uId"></div>
+    <div id="uTime"></div>
+  </div>
+
+  <div class="marquee">
+    Jangan lupa presensi tepat waktu • Pastikan koneksi stabil
+  </div>
+
+  <div class="grid">
+    <button onclick="clockIn()">Clock In</button>
+    <button class="secondary" onclick="clockOut()">Clock Out</button>
+    <button style="background:#27ae60" onclick="openPengajuan()">Pengajuan</button>
+    <button style="background:#f39c12" onclick="loadRiwayat()">Riwayat</button>
+  </div>
+
+  <div style="text-align:center">
+    <button class="danger" onclick="logout()" style="width:60%">Keluar</button>
+  </div>
+</div>
+
+<!-- ADMIN DASHBOARD -->
+<div id="adminDash" class="hidden">
+  <div class="card">
+    <h3>Dashboard Admin</h3>
+    <button onclick="loadPengajuanAdmin()">Lihat Pengajuan</button>
+    <button onclick="loadRekap()">Rekap Absensi</button>
+    <button class="danger" onclick="logout()">Keluar</button>
+  </div>
+</div>
+
+<footer>
+  Supported by: Klase Auto Graha<br>
+  <small>rionurmansyah</small>
+</footer>
+
+<script>
+const API_URL =
+'https://script.google.com/macros/s/AKfycbyTMcRbkX2_cId8blc7KCh8sCNCE8rz84wk1jb8dWiHKv-B4ems6DzanFU-jRq795ay/exec';
+
+let currentUser = null;
+
+function api(data){
+  return fetch(API_URL,{
+    method:'POST',
+    body:JSON.stringify(data)
+  }).then(r=>r.json());
+}
+
+function login(){
+  api({
+    action:'login',
+    id:loginId.value,
+    name:loginName.value
+  }).then(r=>{
+    if(!r.success){alert(r.message);return}
+    currentUser = r.user;
+    loginBox.classList.add('hidden');
+
+    if(r.user.role==='Admin'){
+      adminDash.classList.remove('hidden');
+    }else{
+      userDash.classList.remove('hidden');
+      uName.innerText = r.user.name;
+      uId.innerText = 'ID: '+r.user.id;
+      setInterval(()=>uTime.innerText=new Date().toLocaleString(),1000);
+    }
+  });
+}
+
+function clockIn(){
+  api({
+    action:'clockIn',
+    id:currentUser.id,
+    name:currentUser.name
+  }).then(r=>alert(r.message));
+}
+function clockOut(){
+  api({
+    action:'clockOut',
+    id:currentUser.id
+  }).then(r=>alert(r.message));
+}
+
+function openPengajuan(){
+  const alasan = prompt('Masukkan alasan pengajuan');
+  if(!alasan) return;
+  api({
+    action:'createPengajuan',
+    id:currentUser.id,
+    name:currentUser.name,
+    jenis:'Izin',
+    tanggal:new Date().toISOString().slice(0,10),
+    alasan:alasan
+  }).then(r=>alert(r.message));
+}
+
+function loadRiwayat(){
+  api({
+    action:'getUserHistory',
+    id:currentUser.id
+  }).then(r=>{
+    alert('Total riwayat: '+r.data.length);
+  });
+}
+
+function loadPengajuanAdmin(){
+  api({action:'getPengajuanList'}).then(r=>{
+    alert('Total pengajuan: '+r.data.length);
+  });
+}
+function loadRekap(){
+  api({action:'getAttendanceReport'}).then(r=>{
+    alert('Total data absensi: '+r.data.length);
+  });
+}
+
+function logout(){
+  location.reload();
+}
+</script>
+
+</body>
+</html>
