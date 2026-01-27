@@ -1,211 +1,793 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="id">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Graha Mega Solusindo - Presensi</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Presensi GMS - Admin</title>
+    <!-- Menggunakan FontAwesome untuk Ikon -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <style>
+        :root {
+            --primary-color: #0d6efd; /* Biru utama */
+            --primary-dark: #0b5ed7;
+            --secondary-color: #6c757d;
+            --success-color: #198754;
+            --warning-color: #ffc107;
+            --danger-color: #dc3545;
+            --bg-color: #f0f2f5;
+            --card-bg: #ffffff;
+            --text-main: #212529;
+            --text-muted: #6c757d;
+            --border-radius: 12px;
+            --shadow: 0 4px 6px rgba(0,0,0,0.1);
+        }
 
-<style>
-:root{
-  --navy:#0b2a55;
-  --blue:#1f5fbf;
-  --soft:#f4f7fb;
-  --danger:#e74c3c;
-}
-*{box-sizing:border-box;font-family:Segoe UI,Arial}
-body{margin:0;background:var(--soft)}
-header{
-  background:linear-gradient(135deg,var(--navy),var(--blue));
-  color:#fff;padding:30px 15px;text-align:center
-}
-h1{margin:0;font-size:26px}
-.sub{opacity:.9}
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+        }
 
-.card{
-  background:#fff;border-radius:14px;
-  padding:20px;margin:20px auto;
-  width:90%;max-width:420px;
-  box-shadow:0 10px 30px rgba(0,0,0,.08)
-}
-input,button,select,textarea{
-  width:100%;padding:12px;margin-top:10px;
-  border-radius:10px;border:1px solid #ccc;
-  font-size:15px
-}
-button{
-  background:var(--blue);color:#fff;
-  border:none;font-weight:600
-}
-button.secondary{background:#6c8cd5}
-button.danger{background:var(--danger)}
-.hidden{display:none}
+        body {
+            background-color: #e9ecef;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            color: var(--text-main);
+        }
 
-.user-card{
-  background:linear-gradient(135deg,#0b2a55,#163f8c);
-  color:#fff;border-radius:14px;
-  padding:20px;margin:20px
-}
-.user-card .icon{
-  font-size:48px;opacity:.8
-}
-.marquee{
-  background:#e96a6a;color:#fff;
-  padding:8px;border-radius:8px;
-  margin:10px 20px;font-size:14px
-}
+        /* Mobile Frame Container */
+        .app-container {
+            width: 100%;
+            max-width: 480px;
+            background-color: var(--bg-color);
+            min-height: 100vh;
+            position: relative;
+            overflow: hidden;
+            box-shadow: 0 0 20px rgba(0,0,0,0.1);
+        }
 
-.grid{
-  display:grid;grid-template-columns:1fr 1fr;
-  gap:10px;margin:20px
-}
+        @media (min-width: 481px) {
+            .app-container {
+                min-height: 850px;
+                height: 850px;
+                border-radius: 20px;
+                margin: 20px;
+            }
+        }
 
-footer{
-  text-align:center;color:#999;
-  font-size:12px;margin:30px
-}
-</style>
+        /* --- Styles Umum --- */
+        .hidden {
+            display: none !important;
+        }
+
+        .btn {
+            border: none;
+            padding: 12px 20px;
+            border-radius: 8px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+            font-size: 14px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+        }
+
+        .btn-primary {
+            background-color: var(--primary-color);
+            color: white;
+            width: 100%;
+        }
+
+        .btn-primary:hover {
+            background-color: var(--primary-dark);
+        }
+
+        .btn-outline {
+            background-color: transparent;
+            border: 1px solid var(--primary-color);
+            color: var(--primary-color);
+        }
+
+        .btn:disabled {
+            background-color: #ccc;
+            cursor: not-allowed;
+            border-color: #ccc;
+            color: #666;
+        }
+
+        /* --- Halaman Login --- */
+        #login-page {
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            height: 100%;
+            padding: 40px;
+            background: linear-gradient(135deg, #0d6efd 0%, #00d2ff 100%);
+            color: white;
+            text-align: center;
+        }
+
+        .login-card {
+            background: white;
+            padding: 30px;
+            border-radius: var(--border-radius);
+            width: 100%;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.2);
+            color: var(--text-main);
+        }
+
+        .login-logo {
+            font-size: 48px;
+            color: var(--primary-color);
+            margin-bottom: 10px;
+        }
+
+        .form-group {
+            margin-bottom: 15px;
+            text-align: left;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 5px;
+            font-size: 14px;
+            font-weight: 500;
+        }
+
+        .form-input {
+            width: 100%;
+            padding: 12px;
+            border: 1px solid #ced4da;
+            border-radius: 8px;
+            font-size: 16px;
+            outline: none;
+        }
+
+        .form-input:focus {
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 3px rgba(13, 110, 253, 0.1);
+        }
+
+        /* --- Halaman Dashboard (Absen) --- */
+        #dashboard-page {
+            padding-bottom: 80px; /* Ruang untuk scroll bawah */
+            background-color: var(--bg-color);
+        }
+
+        /* Header */
+        .header {
+            background-color: var(--primary-color);
+            color: white;
+            padding: 20px;
+            border-bottom-left-radius: 20px;
+            border-bottom-right-radius: 20px;
+            box-shadow: var(--shadow);
+            position: relative;
+        }
+
+        .user-info h2 {
+            font-size: 18px;
+            margin-bottom: 5px;
+        }
+
+        .user-info p {
+            font-size: 14px;
+            opacity: 0.9;
+        }
+
+        .datetime-display {
+            margin-top: 15px;
+            font-size: 14px;
+            font-weight: 500;
+            background: rgba(255,255,255,0.2);
+            padding: 8px 12px;
+            border-radius: 8px;
+            display: inline-block;
+        }
+
+        .logout-btn {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            background: rgba(255,255,255,0.2);
+            color: white;
+            border: none;
+            width: 35px;
+            height: 35px;
+            border-radius: 50%;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .logout-btn:hover {
+            background: rgba(255,255,255,0.4);
+        }
+
+        /* Konten Utama */
+        .main-content {
+            padding: 20px;
+        }
+
+        /* Kartu Jam */
+        .attendance-card {
+            background: white;
+            border-radius: var(--border-radius);
+            padding: 20px;
+            text-align: center;
+            box-shadow: var(--shadow);
+            margin-bottom: 20px;
+            margin-top: -30px; /* Overlap header */
+            position: relative;
+            z-index: 10;
+        }
+
+        .clock-time {
+            font-size: 48px;
+            font-weight: 700;
+            color: var(--primary-color);
+            font-family: monospace; /* Agar angka tidak bergeser */
+            margin-bottom: 10px;
+        }
+
+        .attendance-status {
+            display: flex;
+            gap: 15px;
+            margin-top: 20px;
+        }
+
+        .status-box {
+            flex: 1;
+            background-color: #f8f9fa;
+            padding: 15px;
+            border-radius: 10px;
+            border: 1px solid #e9ecef;
+        }
+
+        .status-label {
+            font-size: 12px;
+            color: var(--text-muted);
+            margin-bottom: 5px;
+            text-transform: uppercase;
+        }
+
+        .status-value {
+            font-size: 16px;
+            font-weight: 600;
+            color: var(--text-main);
+            min-height: 24px;
+        }
+
+        .status-value.pending {
+            color: var(--danger-color);
+            font-style: italic;
+        }
+        
+        .status-value.done {
+            color: var(--success-color);
+        }
+
+        .action-buttons {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+            margin-top: 20px;
+        }
+
+        .btn-in {
+            background-color: var(--success-color);
+            color: white;
+            padding: 15px;
+            border-radius: 10px;
+            font-size: 16px;
+            border: none;
+            cursor: pointer;
+            width: 100%;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 5px;
+            transition: 0.3s;
+        }
+
+        .btn-in:hover { background-color: #146c43; }
+
+        .btn-out {
+            background-color: var(--warning-color);
+            color: #000;
+            padding: 15px;
+            border-radius: 10px;
+            font-size: 16px;
+            border: none;
+            cursor: pointer;
+            width: 100%;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 5px;
+            transition: 0.3s;
+        }
+        
+        .btn-out:hover { background-color: #e0a800; }
+
+        /* Menu Grid */
+        .menu-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 15px;
+            margin-bottom: 25px;
+        }
+
+        .menu-item {
+            background: white;
+            padding: 15px 5px;
+            border-radius: 12px;
+            text-align: center;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+            cursor: pointer;
+            transition: transform 0.2s;
+            border: 1px solid transparent;
+        }
+
+        .menu-item:hover {
+            transform: translateY(-3px);
+            border-color: var(--primary-color);
+        }
+
+        .menu-icon {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 10px auto;
+            font-size: 18px;
+        }
+
+        .menu-label {
+            font-size: 12px;
+            color: var(--text-main);
+            font-weight: 600;
+        }
+
+        /* Warna Ikon Menu */
+        .bg-hadir { background-color: #d1e7dd; color: #0f5132; }
+        .bg-sakit { background-color: #f8d7da; color: #842029; }
+        .bg-izin { background-color: #fff3cd; color: #664d03; }
+        .bg-lembur { background-color: #cff4fc; color: #055160; }
+        .bg-cuti { background-color: #e2e3e5; color: #41464b; }
+        .bg-riwayat { background-color: #d0ebff; color: #084298; }
+        .bg-slip { background-color: #f3d9fa; color: #632d74; }
+        .bg-lainnya { background-color: #e9ecef; color: #212529; }
+
+        /* Riwayat Section */
+        .history-section {
+            background: white;
+            border-radius: var(--border-radius);
+            padding: 20px;
+            box-shadow: var(--shadow);
+        }
+
+        .section-title {
+            font-size: 16px;
+            font-weight: 700;
+            margin-bottom: 15px;
+            padding-bottom: 10px;
+            border-bottom: 1px solid #eee;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .history-list {
+            list-style: none;
+        }
+
+        .history-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 12px 0;
+            border-bottom: 1px solid #f8f9fa;
+        }
+
+        .history-item:last-child {
+            border-bottom: none;
+        }
+
+        .h-left {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .h-date {
+            font-weight: 600;
+            font-size: 14px;
+        }
+
+        .h-status {
+            font-size: 12px;
+            color: var(--text-muted);
+        }
+
+        .h-time {
+            font-weight: 700;
+            color: var(--primary-color);
+            background: #e7f1ff;
+            padding: 4px 8px;
+            border-radius: 6px;
+            font-size: 12px;
+        }
+
+        /* Toast Notification */
+        #toast-container {
+            position: fixed;
+            bottom: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            z-index: 1000;
+        }
+
+        .toast {
+            background-color: #323232;
+            color: white;
+            padding: 12px 24px;
+            border-radius: 50px;
+            margin-top: 10px;
+            font-size: 14px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+            opacity: 0;
+            transition: opacity 0.3s, transform 0.3s;
+            transform: translateY(20px);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .toast.show {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        /* Animasi */
+        .fade-in {
+            animation: fadeIn 0.5s ease-in-out;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+    </style>
 </head>
-
 <body>
 
-<header>
-  <h1>Graha Mega Solusindo</h1>
-  <div class="sub">Sistem Presensi Digital</div>
-</header>
+    <div class="app-container">
+        
+        <!-- Halaman Login -->
+        <section id="login-page">
+            <div class="login-card fade-in">
+                <i class="fas fa-user-shield login-logo"></i>
+                <h2 style="margin-bottom: 5px;">Login Admin GMS</h2>
+                <p style="margin-bottom: 25px; color: var(--text-muted);">Silakan masuk sebagai Admin</p>
+                
+                <form id="login-form">
+                    <div class="form-group">
+                        <label>Username Admin</label>
+                        <!-- Default value diubah menjadi Admin01 -->
+                        <input type="text" id="username" class="form-input" placeholder="Contoh: Admin01" value="Admin01" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Password</label>
+                        <input type="password" id="password" class="form-input" placeholder="********" value="admin123" required>
+                    </div>
+                    <button type="submit" class="btn btn-primary">MASUK <i class="fas fa-arrow-right"></i></button>
+                </form>
+            </div>
+        </section>
 
-<!-- LOGIN -->
-<div class="card" id="loginBox">
-  <h2>Selamat Datang</h2>
-  <input id="loginId" placeholder="ID Karyawan / Admin">
-  <input id="loginName" placeholder="Nama Lengkap">
-  <button onclick="login()">Masuk</button>
-</div>
+        <!-- Halaman Dashboard (Absen) -->
+        <section id="dashboard-page" class="hidden">
+            <!-- Header -->
+            <header class="header">
+                <button class="logout-btn" onclick="logout()" title="Keluar">
+                    <i class="fas fa-sign-out-alt"></i>
+                </button>
+                <div class="user-info">
+                    <h2 id="header-welcome">Halo, Admin</h2>
+                    <!-- PERUBAHAN: Kasir diganti menjadi Karyawan -->
+                    <p>Tes Demo KEPALA (Karyawan)</p>
+                </div>
+                <div class="datetime-display" id="current-date">
+                    Memuat tanggal...
+                </div>
+            </header>
 
-<!-- USER DASHBOARD -->
-<div id="userDash" class="hidden">
-  <div class="user-card">
-    <div class="icon">👤</div>
-    <div id="uName"></div>
-    <div id="uId"></div>
-    <div id="uTime"></div>
-  </div>
+            <div class="main-content fade-in">
+                <!-- Kartu Jam & Tombol -->
+                <div class="attendance-card">
+                    <div class="clock-time" id="digital-clock">00:00:00</div>
+                    
+                    <div class="attendance-status">
+                        <div class="status-box">
+                            <div class="status-label">Jam Masuk</div>
+                            <div class="status-value pending" id="time-in">Belum Absen</div>
+                        </div>
+                        <div class="status-box">
+                            <div class="status-label">Jam Pulang</div>
+                            <div class="status-value pending" id="time-out">Belum Absen</div>
+                        </div>
+                    </div>
 
-  <div class="marquee">
-    Jangan lupa presensi tepat waktu • Pastikan koneksi stabil
-  </div>
+                    <div class="action-buttons">
+                        <button class="btn-in" id="btn-check-in" onclick="checkIn()">
+                            <i class="fas fa-fingerprint fa-lg"></i>
+                            ABSEN MASUK
+                        </button>
+                        <button class="btn-out" id="btn-check-out" onclick="checkOut()" disabled>
+                            <i class="fas fa-fingerprint fa-lg"></i>
+                            ABSEN PULANG
+                        </button>
+                    </div>
+                </div>
 
-  <div class="grid">
-    <button onclick="clockIn()">Clock In</button>
-    <button class="secondary" onclick="clockOut()">Clock Out</button>
-    <button style="background:#27ae60" onclick="openPengajuan()">Pengajuan</button>
-    <button style="background:#f39c12" onclick="loadRiwayat()">Riwayat</button>
-  </div>
+                <!-- Menu Grid -->
+                <div class="menu-grid">
+                    <div class="menu-item" onclick="showToast('Menu Hadir diklik')">
+                        <div class="menu-icon bg-hadir"><i class="fas fa-calendar-check"></i></div>
+                        <div class="menu-label">Hadir</div>
+                    </div>
+                    <div class="menu-item" onclick="showToast('Form Sakit dibuka')">
+                        <div class="menu-icon bg-sakit"><i class="fas fa-procedures"></i></div>
+                        <div class="menu-label">Sakit</div>
+                    </div>
+                    <div class="menu-item" onclick="showToast('Form Izin dibuka')">
+                        <div class="menu-icon bg-izin"><i class="fas fa-envelope-open-text"></i></div>
+                        <div class="menu-label">Izin</div>
+                    </div>
+                    <div class="menu-item" onclick="showToast('Lembur direkam')">
+                        <div class="menu-icon bg-lembur"><i class="fas fa-clock"></i></div>
+                        <div class="menu-label">Lembur</div>
+                    </div>
+                    <div class="menu-item" onclick="showToast('Menu Cuti dibuka')">
+                        <div class="menu-icon bg-cuti"><i class="fas fa-plane-departure"></i></div>
+                        <div class="menu-label">Cuti</div>
+                    </div>
+                    <div class="menu-item" onclick="showToast('Menampilkan Riwayat')">
+                        <div class="menu-icon bg-riwayat"><i class="fas fa-history"></i></div>
+                        <div class="menu-label">Riwayat</div>
+                    </div>
+                    <div class="menu-item" onclick="showToast('Slip Gaji diunduh')">
+                        <div class="menu-icon bg-slip"><i class="fas fa-file-invoice-dollar"></i></div>
+                        <div class="menu-label">Slip Gaji</div>
+                    </div>
+                    <div class="menu-item" onclick="showToast('Menu Lainnya')">
+                        <div class="menu-icon bg-lainnya"><i class="fas fa-ellipsis-h"></i></div>
+                        <div class="menu-label">Lainnya</div>
+                    </div>
+                </div>
 
-  <div style="text-align:center">
-    <button class="danger" onclick="logout()" style="width:60%">Keluar</button>
-  </div>
-</div>
+                <!-- Riwayat Absensi -->
+                <div class="history-section">
+                    <div class="section-title">
+                        <span>Riwayat Presensi</span>
+                        <i class="fas fa-chevron-down" style="font-size: 12px; cursor: pointer;"></i>
+                    </div>
+                    <ul class="history-list" id="history-list">
+                        <!-- Data Dummy Awal -->
+                        <li class="history-item">
+                            <div class="h-left">
+                                <span class="h-date">01 Januari 2026</span>
+                                <span class="h-status">Hadir (Lembur)</span>
+                            </div>
+                            <span class="h-time">Lembur Absen</span>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </section>
 
-<!-- ADMIN DASHBOARD -->
-<div id="adminDash" class="hidden">
-  <div class="card">
-    <h3>Dashboard Admin</h3>
-    <button onclick="loadPengajuanAdmin()">Lihat Pengajuan</button>
-    <button onclick="loadRekap()">Rekap Absensi</button>
-    <button class="danger" onclick="logout()">Keluar</button>
-  </div>
-</div>
+        <!-- Container Toast -->
+        <div id="toast-container"></div>
 
-<footer>
-  Supported by: Klase Auto Graha<br>
-  <small>rionurmansyah</small>
-</footer>
+    </div>
 
-<script>
-const API_URL =
-'https://script.google.com/macros/s/AKfycbyTMcRbkX2_cId8blc7KCh8sCNCE8rz84wk1jb8dWiHKv-B4ems6DzanFU-jRq795ay/exec';
+    <script>
+        // --- State Management Sederhana ---
+        let appState = {
+            isLoggedIn: false,
+            username: '',
+            role: 'Admin', // Role di set ke Admin
+            hasCheckedIn: false,
+            hasCheckedOut: false,
+            checkInTime: null,
+            checkOutTime: null
+        };
 
-let currentUser = null;
+        // --- DOM Elements ---
+        const loginPage = document.getElementById('login-page');
+        const dashboardPage = document.getElementById('dashboard-page');
+        const loginForm = document.getElementById('login-form');
+        const usernameInput = document.getElementById('username');
+        const headerWelcome = document.getElementById('header-welcome');
+        const digitalClock = document.getElementById('digital-clock');
+        const currentDateEl = document.getElementById('current-date');
+        const timeInDisplay = document.getElementById('time-in');
+        const timeOutDisplay = document.getElementById('time-out');
+        const btnCheckIn = document.getElementById('btn-check-in');
+        const btnCheckOut = document.getElementById('btn-check-out');
+        const historyList = document.getElementById('history-list');
 
-function api(data){
-  return fetch(API_URL,{
-    method:'POST',
-    body:JSON.stringify(data)
-  }).then(r=>r.json());
-}
+        // --- Clock Functionality ---
+        function updateClock() {
+            const now = new Date();
+            
+            // Format Jam (HH:MM:SS)
+            const timeString = now.toLocaleTimeString('id-ID', { 
+                hour12: false, 
+                hour: '2-digit', 
+                minute: '2-digit', 
+                second: '2-digit' 
+            });
+            digitalClock.innerText = timeString;
 
-function login(){
-  api({
-    action:'login',
-    id:loginId.value,
-    name:loginName.value
-  }).then(r=>{
-    if(!r.success){alert(r.message);return}
-    currentUser = r.user;
-    loginBox.classList.add('hidden');
+            // Format Tanggal (Hari, DD Bulan YYYY)
+            const dateString = now.toLocaleDateString('id-ID', { 
+                weekday: 'long', 
+                day: 'numeric', 
+                month: 'long', 
+                year: 'numeric' 
+            });
+            currentDateEl.innerText = dateString;
+        }
+        setInterval(updateClock, 1000);
+        updateClock(); // Run immediately
 
-    if(r.user.role==='Admin'){
-      adminDash.classList.remove('hidden');
-    }else{
-      userDash.classList.remove('hidden');
-      uName.innerText = r.user.name;
-      uId.innerText = 'ID: '+r.user.id;
-      setInterval(()=>uTime.innerText=new Date().toLocaleString(),1000);
-    }
-  });
-}
+        // --- Navigation Logic ---
+        loginForm.addEventListener('submit', function(e) {
+            e.preventDefault();
+            const user = usernameInput.value;
+            if(user) {
+                appState.isLoggedIn = true;
+                appState.username = user;
+                
+                // Menampilkan "Halo, Admin" atau nama user
+                headerWelcome.innerText = `Halo, ${appState.role === 'Admin' ? 'Admin' : user}`;
+                
+                // Animasi transisi sederhana
+                loginPage.classList.add('hidden');
+                dashboardPage.classList.remove('hidden');
+                
+                showToast(`Selamat datang, ${user}!`);
+            }
+        });
 
-function clockIn(){
-  api({
-    action:'clockIn',
-    id:currentUser.id,
-    name:currentUser.name
-  }).then(r=>alert(r.message));
-}
-function clockOut(){
-  api({
-    action:'clockOut',
-    id:currentUser.id
-  }).then(r=>alert(r.message));
-}
+        function logout() {
+            if(confirm('Apakah Anda yakin ingin keluar?')) {
+                // Reset state visual
+                appState.isLoggedIn = false;
+                appState.hasCheckedIn = false;
+                appState.hasCheckedOut = false;
+                resetDashboardUI();
+                
+                dashboardPage.classList.add('hidden');
+                loginPage.classList.remove('hidden');
+                loginForm.reset();
+                showToast('Berhasil keluar');
+            }
+        }
 
-function openPengajuan(){
-  const alasan = prompt('Masukkan alasan pengajuan');
-  if(!alasan) return;
-  api({
-    action:'createPengajuan',
-    id:currentUser.id,
-    name:currentUser.name,
-    jenis:'Izin',
-    tanggal:new Date().toISOString().slice(0,10),
-    alasan:alasan
-  }).then(r=>alert(r.message));
-}
+        function resetDashboardUI() {
+            timeInDisplay.innerText = "Belum Absen";
+            timeInDisplay.className = "status-value pending";
+            timeOutDisplay.innerText = "Belum Absen";
+            timeOutDisplay.className = "status-value pending";
+            btnCheckIn.disabled = false;
+            btnCheckIn.innerHTML = '<i class="fas fa-fingerprint fa-lg"></i> ABSEN MASUK';
+            btnCheckOut.disabled = true;
+        }
 
-function loadRiwayat(){
-  api({
-    action:'getUserHistory',
-    id:currentUser.id
-  }).then(r=>{
-    alert('Total riwayat: '+r.data.length);
-  });
-}
+        // --- Attendance Logic ---
+        function checkIn() {
+            const now = new Date();
+            const timeStr = now.toLocaleTimeString('id-ID', { hour12: false, hour: '2-digit', minute: '2-digit' });
+            
+            appState.hasCheckedIn = true;
+            appState.checkInTime = timeStr;
+            
+            // Update UI
+            timeInDisplay.innerText = timeStr;
+            timeInDisplay.className = "status-value done";
+            
+            btnCheckIn.disabled = true;
+            btnCheckIn.innerHTML = '<i class="fas fa-check"></i> SUDAH MASUK';
+            
+            btnCheckOut.disabled = false;
+            
+            showToast(`Absen Masuk berhasil: ${timeStr}`);
+            
+            // Tambahkan ke riwayat (simulasi)
+            addToHistory(timeStr, "Masuk");
+        }
 
-function loadPengajuanAdmin(){
-  api({action:'getPengajuanList'}).then(r=>{
-    alert('Total pengajuan: '+r.data.length);
-  });
-}
-function loadRekap(){
-  api({action:'getAttendanceReport'}).then(r=>{
-    alert('Total data absensi: '+r.data.length);
-  });
-}
+        function checkOut() {
+            if (!appState.hasCheckedIn) return;
+            
+            const now = new Date();
+            const timeStr = now.toLocaleTimeString('id-ID', { hour12: false, hour: '2-digit', minute: '2-digit' });
+            
+            appState.hasCheckedOut = true;
+            appState.checkOutTime = timeStr;
+            
+            // Update UI
+            timeOutDisplay.innerText = timeStr;
+            timeOutDisplay.className = "status-value done";
+            
+            btnCheckOut.disabled = true;
+            btnCheckOut.innerHTML = '<i class="fas fa-check"></i> SUDAH PULANG';
+            
+            showToast(`Absen Pulang berhasil: ${timeStr}`);
+            showToast("Hari kerja selesai, Hati-hati di jalan!");
+            
+            // Update riwayat terakhir atau tambah baru
+            addToHistory(timeStr, "Pulang");
+        }
 
-function logout(){
-  location.reload();
-}
-</script>
+        function addToHistory(time, type) {
+            const now = new Date();
+            const dateStr = now.toLocaleDateString('id-ID', { day: 'numeric', month: 'long', year: 'numeric' });
+            
+            const li = document.createElement('li');
+            li.className = 'history-item fade-in';
+            
+            let statusLabel = type === 'Masuk' ? 'Absen Masuk' : 'Absen Pulang';
 
+            li.innerHTML = `
+                <div class="h-left">
+                    <span class="h-date">${dateStr}</span>
+                    <span class="h-status">${statusLabel}</span>
+                </div>
+                <span class="h-time">${time}</span>
+            `;
+            
+            // Insert di paling atas (setelah header list)
+            historyList.insertBefore(li, historyList.firstChild);
+        }
+
+        // --- Toast Notification System ---
+        function showToast(message) {
+            const container = document.getElementById('toast-container');
+            
+            const toast = document.createElement('div');
+            toast.className = 'toast';
+            toast.innerHTML = `<i class="fas fa-info-circle"></i> <span>${message}</span>`;
+            
+            container.appendChild(toast);
+            
+            // Trigger reflow
+            void toast.offsetWidth; 
+            
+            // Show
+            toast.classList.add('show');
+            
+            // Remove after 3 seconds
+            setTimeout(() => {
+                toast.classList.remove('show');
+                setTimeout(() => {
+                    container.removeChild(toast);
+                }, 300);
+            }, 3000);
+        }
+
+    </script>
 </body>
 </html>
